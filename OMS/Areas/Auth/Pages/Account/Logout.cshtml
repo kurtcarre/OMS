@@ -1,0 +1,14 @@
+﻿@page
+@model LogoutModel
+
+@{ 
+	ViewData["Title"] = "Logout";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if(!User.Identity.IsAuthenticated)
+{
+	<p>You have successfully logged out.</p>
+	<a asp-area="Auth" asp-page="Login" class="btn btn-primary">Login...</a>
+}

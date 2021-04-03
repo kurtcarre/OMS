@@ -1,0 +1,45 @@
+﻿@model OMS.Models.ChildMember
+
+@{ 
+	ViewData["Title"] = "Edit child - " + Model.Member.FirstName + " " + Model.Member.LastName;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+	<div class="col-lg">
+		<form id="edit-child-member" method="post">
+			<input asp-for="MemberNo" type="hidden" />
+			<input asp-for="DoB" type="hidden" />
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<div class="form-group">
+				<label asp-for="MemberNo"></label>
+				<input asp-for="MemberNo" class="form-control" disabled />
+				<label asp-for="Member.FirstName"></label>
+				<input asp-for="Member.FirstName" class="form-control" disabled />
+				<label asp-for="Member.LastName"></label>
+				<input asp-for="Member.LastName" class="form-control" disabled />
+				<label asp-for="DoB"></label>
+				<input asp-for="DoB" class="form-control" disabled />
+			</div>
+			<div class="form-group">
+				<label asp-for="ParentFirstName"></label>
+				<input asp-for="ParentFirstName" class="form-control" />
+				<span asp-validation-for="ParentFirstName" class="text-danger"></span>
+				<label asp-for="ParentLastName"></label>
+				<input asp-for="ParentLastName" class="form-control" />
+				<span asp-validation-for="ParentLastName" class="text-danger"></span>
+				<label asp-for="EmergencyContactNo"></label>
+				<input asp-for="EmergencyContactNo" class="form-control" />
+				<span asp-validation-for="EmergencyContactNo" class="text-danger"></span>
+				<label asp-for="Consent"></label>
+				<input asp-for="Consent" class="form-control" />
+				<span asp-validation-for="Consent" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<button id="edit-child-member-submit" type="submit" class="btn btn-primary">Save...</button>
+				<a asp-controller="ChildMember" asp-action="Index" class="btn btn-secondary">Cancel</a>
+			</div>
+		</form>
+	</div>
+</div>

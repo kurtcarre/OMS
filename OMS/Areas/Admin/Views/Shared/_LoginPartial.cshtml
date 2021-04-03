@@ -1,0 +1,24 @@
+﻿@using OMS.Auth
+@inject SignInManager<User> SignInManager
+
+<ul class="navbar-nav">
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item">
+        @*<a  class="nav-link text-light" asp-area="Auth" asp-page="#" title="Manage">Hello @User.Identity.Name!</a>*@
+        <a href="" class="nav-link text-light">Hello @User.Identity.Name!</a>
+    </li>
+    <li class="nav-item">
+        <a asp-area="Auth" asp-page="/Account/Logout" class="nav-link text-light">Logout</a>
+    </li>
+}
+else
+{
+@*   <li class="nav-item">
+        <a class="nav-link text-light" asp-area="Auth" asp-page="#">Register</a>
+    </li>*@
+    <li class="nav-item">
+        <a class="nav-link text-light" asp-area="Auth" asp-page="/Account/Login">Login</a>
+    </li>
+}
+</ul>

@@ -1,0 +1,77 @@
+﻿@model OMS.Models.Member
+
+@{ 
+	ViewData["Title"] = "Edit - " + Model.FirstName + " " + Model.LastName;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+	<div class="col-lg">
+		<p>@ViewData["ErrorMessage"]</p>
+		<form id="edit-member" method="post">
+			<input type="hidden" asp-for="MemberNo" />
+			<input type="hidden" asp-for="DateJoined" />
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<div class="form-group">
+				<label asp-for="MemberNo"></label>
+				<input asp-for="MemberNo" class="form-control" disabled />
+				<label asp-for="DateJoined"></label>
+				<input asp-for="DateJoined" class="form-control" disabled />
+			</div>
+			<div class="form-group">
+				<label asp-for="Title"></label>
+				<select asp-for="Title" class="form-control" asp-items="@Member.Titles"></select>
+				<span asp-validation-for="Title" class="text-danger"></span>
+				<label asp-for="FirstName"></label>
+				<input asp-for="FirstName" class="form-control" />
+				<span asp-validation-for="FirstName" class="text-danger"></span>
+				<label asp-for="LastName"></label>
+				<input asp-for="LastName" class="form-control" />
+				<span asp-validation-for="LastName" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label asp-for="Email"></label>
+				<input asp-for="Email" class="form-control" />
+				<span asp-validation-for="Email" class="text-danger"></span>
+				<label asp-for="Address1"></label>
+				<input asp-for="Address1" class="form-control" />
+				<span asp-validation-for="Address1" class="text-danger"></span>
+				<label asp-for="Address2"></label>
+				<input asp-for="Address2" class="form-control" />
+				<span asp-validation-for="Address2" class="text-danger"></span>
+				<label asp-for="Parish"></label>
+				<input asp-for="Parish" class="form-control" />
+				<span asp-validation-for="Parish" class="text-danger"></span>
+				<label asp-for="PostCode"></label>
+				<input asp-for="PostCode" class="form-control" />
+				<span asp-validation-for="PostCode" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label asp-for="MemberType"></label>
+				<input asp-for="MemberType" class="form-control" />
+				<span asp-validation-for="MemberType" class="text-danger"></span>
+				<label asp-for="Under18"></label>
+				<input asp-for="Under18" class="form-control" />
+				<span asp-validation-for="Under18" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label asp-for="Section"></label>
+				<select asp-for="Section" class="form-control" asp-items="@Member.Sections"></select>
+				<span asp-validation-for="Section" class="text-danger"></span>
+				<label asp-for="Instrument"></label>
+				<input asp-for="Instrument" class="form-control" />
+				<span asp-validation-for="Instrument" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<button id="edit-member-submit" type="submit" class="btn btn-primary">Save...</button>
+				<a asp-controller="Member" asp-action="Index" class="btn btn-secondary">Cancel</a>
+			</div>
+		</form>
+	</div>
+</div>
+
+@section Scripts
+{
+	<partial name="_ValidationScriptsPartial" />
+}

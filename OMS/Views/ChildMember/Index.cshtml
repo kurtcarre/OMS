@@ -1,0 +1,39 @@
+﻿@model IEnumerable<OMS.Models.ChildMember>
+
+@{ 
+	ViewData["Title"] = "Child Members";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>@Html.DisplayNameFor(model => model.MemberNo)</th>
+			<th>@Html.DisplayNameFor(model => model.Member.LastName)</th>
+			<th>@Html.DisplayNameFor(model => model.Member.FirstName)</th>
+			<th>@Html.DisplayNameFor(model => model.ParentFirstName)</th>
+			<th>@Html.DisplayNameFor(model => model.ParentLastName)</th>
+			<th>@Html.DisplayNameFor(model => model.EmergencyContactNo)</th>
+			<th>@Html.DisplayNameFor(model => model.Age)</th>
+			<th>@Html.DisplayNameFor(model => model.DoB)</th>
+			<th>@Html.DisplayNameFor(model => model.Consent)</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach(var child in Model)
+		{
+			<tr>
+				<td><a asp-controller="ChildMember" asp-action="Edit" asp-route-id="@child.MemberNo">@Html.DisplayFor(item => child.MemberNo)</a></td>
+				<td>@Html.DisplayFor(item => child.Member.LastName)</td>
+				<td>@Html.DisplayFor(item => child.Member.FirstName)</td>
+				<td>@Html.DisplayFor(item => child.ParentFirstName)</td>
+				<td>@Html.DisplayFor(item => child.ParentLastName)</td>
+				<td>@Html.DisplayFor(item => child.EmergencyContactNo)</td>
+				<td>@Html.DisplayFor(item => child.Age)</td>
+				<td>@Html.DisplayFor(item => child.DoB)</td>
+				<td>@Html.DisplayFor(item => child.Consent)</td>
+			</tr>
+		}
+	</tbody>
+</table>
