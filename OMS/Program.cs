@@ -14,7 +14,14 @@ namespace OMS
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            //CreateHostBuilder(args).Build().Run();
+
+            // *** DEV ONLY ***
+            var host = CreateHostBuilder(args).Build();
+
+            Dev.DevDB.SeedDB(host).GetAwaiter().GetResult();
+
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
