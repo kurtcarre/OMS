@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
@@ -46,7 +47,7 @@ namespace OMS.Auth.Services
             return outputBytes;
         }
 
-        public PasswordVerificationResult VerifyHashedPassword(string hashedPassword, string suppliedPassword)
+        public Task<SignInResult> VerifyHashedPassword(string hashedPassword, string suppliedPassword)
         {
             if (hashedPassword == null)
                 throw new ArgumentNullException(nameof(hashedPassword));
@@ -56,17 +57,17 @@ namespace OMS.Auth.Services
             byte[] decodedHashedPassword = Convert.FromBase64String(hashedPassword);
 
             if (decodedHashedPassword.Length == 0)
-                return PasswordVerificationResult.Failed;
+                return Task.FromResult(SignInResult.Failed);
 
             int embeddedIterCount;
             if(VerifyHashedPassword(decodedHashedPassword, suppliedPassword, out embeddedIterCount))
             {
-                return (embeddedIterCount < _iterCount)
-                    ? PasswordVerificationResult.SuccessRehashNeeded
-                    : PasswordVerificationResult.Success;
+                return Task.FromResult((embeddedIterCount < _iterCount)
+                    ? SignInResult.RehashNeeded
+                    : SignInResult.Success);
             }
 
-            return PasswordVerificationResult.Failed;
+            return Task.FromResult(SignInResult.Failed);
         }
 
         private bool VerifyHashedPassword(byte[] hashedPassword, string password, out int iterCount)

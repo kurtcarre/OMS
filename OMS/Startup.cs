@@ -36,7 +36,7 @@ namespace OMS
 
             //  services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
             //      .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DBContext>();
+            services.AddAuth();
             services.AddRazorPages();
             services.AddControllersWithViews();
 

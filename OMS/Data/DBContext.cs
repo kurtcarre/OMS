@@ -1,12 +1,11 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using OMS.Auth;
+using OMS.Auth.Models;
 using OMS.Models;
-using OMS.Auth.EntityFrameworkCore;
 
 namespace OMS.Data
 {
-    public class DBContext : AuthDBContext
+    public class DBContext : DbContext
     {
         public DBContext(DbContextOptions<DBContext> options) : base(options)
         {
@@ -15,10 +14,11 @@ namespace OMS.Data
 
         public DbSet<Member> Members { get; set; }
         public DbSet<ChildMember> ChildMembers { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
+            //base.OnModelCreating(builder);
 
             builder.Entity<Member>(m =>
             {
@@ -36,6 +36,17 @@ namespace OMS.Data
                 cm.HasKey(m => m.MemberNo);
                 cm.ToTable("ChildMembers");
                 cm.Property(m => m.MemberNo).ValueGeneratedNever();
+            });
+
+            builder.Entity<User>(u =>
+            {
+                u.HasKey(k => k.Id);
+                u.HasIndex(i => i.UserName).HasDatabaseName("UsernameIndex").IsUnique();
+                u.HasIndex(i => i.Email).HasDatabaseName("EmailIndex").IsUnique();
+                u.ToTable("Users");
+
+                u.Property(p => p.UserName).HasMaxLength(256);
+                u.Property(u => u.Email).HasMaxLength(256);
             });
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using OMS.Auth.Services;
 
 namespace OMS.Auth.UI.Pages
 {
@@ -11,10 +12,10 @@ namespace OMS.Auth.UI.Pages
     [ValidateAntiForgeryToken]
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<User> SignInManager;
+        private readonly SignInManager SignInManager;
         private readonly ILogger<LoginModel> Logger;
 
-        public LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager signInManager, ILogger<LoginModel> logger)
         {
             SignInManager = signInManager;
             Logger = logger;
@@ -48,8 +49,8 @@ namespace OMS.Auth.UI.Pages
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            SignInResult result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, false);
-            if(result.Succeeded)
+            var result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password);
+            if(result == Services.SignInResult.Success)
             {
                 Logger.LogInformation(LoggerEventIds.UserLoggedIn, "User logged in!");
                 if (returnUrl == null)

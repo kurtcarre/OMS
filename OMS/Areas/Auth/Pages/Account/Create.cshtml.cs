@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using OMS.Auth.Models;
+using OMS.Auth.Services;
 
 namespace OMS.Auth.UI.Pages
 {
@@ -13,10 +15,9 @@ namespace OMS.Auth.UI.Pages
     [ValidateAntiForgeryToken]
     public class CreateModel : PageModel
     {
-        private readonly SignInManager<User> SignInManager;
-        private readonly UserManager<User> UserManager;
+        private readonly SignInManager SignInManager;
+        private readonly UserManager UserManager;
         private readonly ILogger<CreateModel> Logger;
-        private readonly IUserStore<User> UserStore;
 
         public string ReturnUrl { get; set; }
 
@@ -43,12 +44,11 @@ namespace OMS.Auth.UI.Pages
             public string ConfirmPassword { get; set; }
         }
 
-        public CreateModel(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<CreateModel> logger, IUserStore<User> userStore)
+        public CreateModel(SignInManager signInManager, UserManager userManager, ILogger<CreateModel> logger)
         {
             SignInManager = signInManager;
             UserManager = userManager;
             Logger = logger;
-            UserStore = userStore;
         }
 
         public void OnGet(string returnUrl = null)
@@ -63,25 +63,15 @@ namespace OMS.Auth.UI.Pages
             {
                 User user = Activator.CreateInstance<User>();
 
-                await UserStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);
-                IUserEmailStore<User> emailStore = UserStore as IUserEmailStore<User>;
-                await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                AuthResult result = await UserManager.CreateAsync(user, Input.Password);
-                if(result.Succeeded)
-                {
-                    Logger.LogInformation(LoggerEventIds.UserCreated, "New user created!");
-
-                    if(UserManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        // DEV ONLY
-                        await emailStore.SetEmailConfirmedAsync(user, true, CancellationToken.None);
-                        await SignInManager.SignInAsync(user, false);
-                        if (returnUrl == null)
-                            return LocalRedirect("~/");
-                        else
-                            return LocalRedirect(returnUrl);
-                    }
-                }
+                user.UserName = Input.Username;
+                user.Email = Input.Email;
+                await UserManager.CreateUser(user, Input.Password);
+                Logger.LogInformation(LoggerEventIds.UserCreated, "New user created!");
+                await SignInManager.SignInAsync(user);
+                if (returnUrl == null)
+                    return LocalRedirect("~/");
+                else
+                    return LocalRedirect(returnUrl);
             }
             return Page();
         }

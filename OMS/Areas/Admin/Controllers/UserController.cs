@@ -5,7 +5,8 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using OMS.Auth;
+using OMS.Auth.Models;
+using OMS.Auth.Services;
 using OMS.Data;
 
 namespace OMS.Admin.Controllers
@@ -15,8 +16,7 @@ namespace OMS.Admin.Controllers
     {
         private readonly DBContext dbContext;
         private readonly ILogger<UserController> logger;
-        private readonly UserManager<User> userManager;
-        private readonly IUserStore<User> userStore;
+        private readonly UserManager userManager;
 
         public class InputModel
         {
@@ -38,12 +38,11 @@ namespace OMS.Admin.Controllers
             public string ConfirmPassword { get; set; }
         }
 
-        public UserController(DBContext _dbContext, ILogger<UserController> _logger, UserManager<User> _userManager, IUserStore<User> _userStore)
+        public UserController(DBContext _dbContext, ILogger<UserController> _logger, UserManager _userManager)
         {
             dbContext = _dbContext;
             logger = _logger;
             userManager = _userManager;
-            userStore = _userStore;
         }
 
         public async Task<ActionResult> Index()
@@ -63,18 +62,11 @@ namespace OMS.Admin.Controllers
         {
             User user = Activator.CreateInstance<User>();
 
-            await userStore.SetUserNameAsync(user, newUser.Username, CancellationToken.None);
-            IUserEmailStore<User> emailStore = userStore as IUserEmailStore<User>;
-            await emailStore.SetEmailAsync(user, newUser.Email, CancellationToken.None);
-            AuthResult result = await userManager.CreateAsync(user, newUser.Password);
-            if(result.Succeeded)
-            {
-                logger.LogInformation(LoggerEventIds.UserCreated, "New user created!");
-                return RedirectToAction("Index", "User");
-            }
-
-            ViewData["Error"] = result.ToString();
-            return View();
+            user.UserName = newUser.Username;
+            user.Email = newUser.Email;
+            await userManager.CreateUser(user, newUser.Password);
+            logger.LogInformation(LoggerEventIds.UserCreated, "New user created!");
+            return RedirectToAction("Index", "User");
         }
 
         public async Task<ActionResult> Edit(string Id)
@@ -82,7 +74,7 @@ namespace OMS.Admin.Controllers
             if (Id == null || Id == string.Empty)
                 return NotFound();
 
-            User user = await userStore.FindByIdAsync(Id, CancellationToken.None);
+            User user = await userManager.FindUserById(Id);
 
             if (user == null)
                 return NotFound();
@@ -94,12 +86,8 @@ namespace OMS.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(User user)
         {
-            AuthResult result = await userManager.UpdateAsync(user);
-            if (result.Succeeded)
-                return RedirectToAction("Index", "User");
-
-            ViewData["Error"] = result.ToString();
-            return View();
+            await userManager.AmendUser(user);
+            return RedirectToAction("Index", "User");
         }
 
         public ActionResult ResetPassword(string Id)
@@ -119,17 +107,13 @@ namespace OMS.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResetPassword(ResetModel reset)
         {
-            User user = await userStore.FindByIdAsync(reset.Id, CancellationToken.None);
+            User user = await userManager.FindUserById(reset.Id);
 
             if (user == null)
                 return NotFound();
 
-            AuthResult result = await userManager.AdminResetPasswordAsync(user, reset.NewPassword);
-            if (result.Succeeded)
-                return RedirectToAction("Index", "User");
-
-            ViewData["Error"] = result.ToString();
-            return View();
+            await userManager.AdminResetPasswordAsync(user, reset.NewPassword);
+            return RedirectToAction("Index", "User");
         }
 
         public class ResetModel

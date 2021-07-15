@@ -1,5 +1,5 @@
-﻿@using OMS.Auth
-@inject SignInManager<User> SignInManager
+﻿@using OMS.Auth.Services
+@inject SignInManager SignInManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
