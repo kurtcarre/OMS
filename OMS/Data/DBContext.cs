@@ -15,11 +15,11 @@ namespace OMS.Data
         public DbSet<Member> Members { get; set; }
         public DbSet<ChildMember> ChildMembers { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            //base.OnModelCreating(builder);
-
             builder.Entity<Member>(m =>
             {
                 m.HasKey(mem => mem.MemberNo);
@@ -27,8 +27,6 @@ namespace OMS.Data
                 m.HasIndex(mem => mem.FirstName).HasDatabaseName("FirstNameIndex");
                 m.ToTable("Members");
                 m.Property(mem => mem.MemberNo).ValueGeneratedOnAdd();
-
-                m.HasOne<ChildMember>().WithOne(r => r.Member).HasForeignKey<ChildMember>(k => k.MemberNo);
             });
 
             builder.Entity<ChildMember>(cm =>
@@ -36,6 +34,8 @@ namespace OMS.Data
                 cm.HasKey(m => m.MemberNo);
                 cm.ToTable("ChildMembers");
                 cm.Property(m => m.MemberNo).ValueGeneratedNever();
+
+                cm.HasOne(m => m.Member).WithOne().HasForeignKey<ChildMember>(k => k.MemberNo);
             });
 
             builder.Entity<User>(u =>
@@ -47,6 +47,22 @@ namespace OMS.Data
 
                 u.Property(p => p.UserName).HasMaxLength(256);
                 u.Property(u => u.Email).HasMaxLength(256);
+
+                u.HasMany(r => r.Roles).WithMany(r => r.Users).UsingEntity<UserRole>(
+                    ur => ur.HasOne(u => u.Role).WithMany().HasForeignKey(k => k.RoleId),
+                    ur => ur.HasOne(r => r.User).WithMany().HasForeignKey(k => k.UserId),
+                    ur =>
+                    {
+                        ur.HasKey(k => new { k.UserId, k.RoleId });
+                        ur.ToTable("UserRoles");
+                    });
+            });
+
+            builder.Entity<Role>(r =>
+            {
+                r.HasKey(k => k.Id);
+                r.HasIndex(i => i.RoleName).HasDatabaseName("RoleNameIndex").IsUnique();
+                r.ToTable("Roles");
             });
         }
     }

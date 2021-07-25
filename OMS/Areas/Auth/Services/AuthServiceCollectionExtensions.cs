@@ -21,6 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddHttpContextAccessor();
             services.TryAddScoped<PasswordHasher>();
             services.TryAddScoped<UserManager>();
+            services.TryAddScoped<RoleManager>();
             services.TryAddScoped<SignInManager>();
         }
     }

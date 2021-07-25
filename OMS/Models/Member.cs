@@ -31,7 +31,6 @@ namespace OMS.Models
         public string MemberType { get; set; }
         [Display(Name = "Under 18")]
         public bool Under18 { get; set; }
-        public ChildMember ChildMember { get; set; }
 
         [Required]
         public string Section { get; set; }

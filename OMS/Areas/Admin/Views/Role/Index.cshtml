@@ -1,0 +1,28 @@
+﻿@model IEnumerable<OMS.Auth.Models.Role>
+@{ 
+	ViewData["Title"] = "Roles";
+}
+
+<h1>Roles</h1>
+
+<a class="btn btn-primary" asp-area="Admin" asp-controller="Role" asp-action="Create">Create...</a>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>@Html.DisplayNameFor(model => model.RoleName)</th>
+			<th>@Html.DisplayNameFor(model => model.Users)</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach(var role in Model)
+        {
+			<tr>
+				<td>@Html.DisplayFor(item => role.RoleName)</td>
+				<td>@Html.DisplayFor(item => role.Users)</td>
+				<td><a asp-area="Admin" asp-controller="Role" asp-action="ManageUsers" asp-route-id="@role.Id">Manage Users</a>&nbsp;<a asp-area="Admin" asp-controller="Role" asp-action="Edit" asp-route-id="@role.Id">Edit</a>&nbsp;<a asp-area="Admin" asp-controller="Role" asp-action="Delete" asp-route-id="@role.Id">Delete</a></td>
+			</tr>
+        }
+	</tbody>
+</table>

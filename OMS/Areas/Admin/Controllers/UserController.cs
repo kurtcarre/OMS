@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
@@ -7,14 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OMS.Auth.Models;
 using OMS.Auth.Services;
-using OMS.Data;
 
 namespace OMS.Admin.Controllers
 {
     [Area("Admin")]
     public class UserController : Controller
     {
-        private readonly DBContext dbContext;
         private readonly ILogger<UserController> logger;
         private readonly UserManager userManager;
 
@@ -38,9 +35,8 @@ namespace OMS.Admin.Controllers
             public string ConfirmPassword { get; set; }
         }
 
-        public UserController(DBContext _dbContext, ILogger<UserController> _logger, UserManager _userManager)
+        public UserController(ILogger<UserController> _logger, UserManager _userManager)
         {
-            dbContext = _dbContext;
             logger = _logger;
             userManager = _userManager;
         }
@@ -48,7 +44,7 @@ namespace OMS.Admin.Controllers
         public async Task<ActionResult> Index()
         {
             ViewData["Active"] = "users";
-            return View(await dbContext.Users.ToListAsync());
+            return View(await userManager.Users.ToListAsync());
         }
 
         public ActionResult Create()
@@ -84,8 +80,11 @@ namespace OMS.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(User user)
+        public async Task<ActionResult> Edit(string Id, User user)
         {
+            if (Id == null || Id == string.Empty)
+                return NotFound();
+
             await userManager.AmendUser(user);
             return RedirectToAction("Index", "User");
         }
@@ -105,8 +104,11 @@ namespace OMS.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ResetPassword(ResetModel reset)
+        public async Task<ActionResult> ResetPassword(string Id, ResetModel reset)
         {
+            if (Id == null || Id == string.Empty)
+                return NotFound();
+
             User user = await userManager.FindUserById(reset.Id);
 
             if (user == null)
@@ -131,6 +133,22 @@ namespace OMS.Admin.Controllers
             [Display(Name = "Confirm password")]
             [Compare("NewPassword", ErrorMessage = "Passwords must match!")]
             public string ConfirmPassword { get; set; }
+        }
+
+        public async Task<ActionResult> Delete(string Id)
+        {
+            if (Id == null || Id == string.Empty)
+                return NotFound();
+
+            User user = await userManager.FindUserById(Id);
+            if (user == null)
+                return NotFound();
+
+            if (user.Id == User.FindFirst("UserID").Value)
+                return Forbid();
+
+            await userManager.DeleteUser(user);
+            return RedirectToAction("Index", "User");
         }
     }
 }

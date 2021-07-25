@@ -19,7 +19,7 @@ namespace OMS
             // *** DEV ONLY ***
             var host = CreateHostBuilder(args).Build();
 
-            //Dev.DevDB.SeedDB(host).GetAwaiter().GetResult();
+            Dev.DevDB.SeedDB(host).GetAwaiter().GetResult();
 
             host.Run();
         }
