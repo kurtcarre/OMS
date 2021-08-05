@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OMS.Auth.Models;
 using OMS.Auth.Services;
-using OMS.Data;
 
 namespace OMS.Admin.Controllers
 {
@@ -13,10 +11,12 @@ namespace OMS.Admin.Controllers
     public class RoleController : Controller
     {
         private readonly RoleManager roleManager;
+        private readonly UserManager userManager;
 
-        public RoleController(RoleManager _roleManager)
+        public RoleController(RoleManager _roleManager, UserManager _userManager)
         {
             roleManager = _roleManager;
+            userManager = _userManager;
         }
 
         public async Task<ActionResult> Index()
@@ -87,19 +87,61 @@ namespace OMS.Admin.Controllers
 
             Role role = await roleManager.FindRoleByIdAsync(Id);
             role.Users = await roleManager.GetUsersInRoleAsync(role);
-            return View(new ManageUserModel(role.Id, role.Users, await roleManager.GetUsersNotInRoleAsync(role)));
+            return View(new ManageUserModel(role.Id, role.RoleName, role.Users, await roleManager.GetUsersNotInRoleAsync(role)));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ManageUsers(string Id, ManageUserModel model)
+        {
+            if (Id == null || Id == string.Empty)
+                return NotFound();
+
+            Role role = await roleManager.FindRoleByIdAsync(Id);
+            if (role == null)
+                return NotFound();
+
+            if (model.AddUsers != null)
+            {
+                foreach (var id in model.AddUsers)
+                {
+                    User user = await userManager.FindUserById(id);
+                    await roleManager.AddUserToRole(user, role);
+                }
+            }
+
+            if (model.RemoveUsers != null)
+            {
+                foreach (var id in model.RemoveUsers)
+                {
+                    User user = await userManager.FindUserById(id);
+                    await roleManager.RemoveUserFromRole(user, role);
+                }
+            }
+
+            return RedirectToAction("Index", "Role");
         }
 
         public class ManageUserModel
         {
             public string RoleId { get; set; }
+            public string RoleName { get; set; }
 
             public ICollection<User> RoleUsers { get; set; }
             public ICollection<User> OtherUsers { get; set; }
 
-            public ManageUserModel(string roleId, ICollection<User> roleUsers, ICollection<User> otherUsers)
+            public ICollection<string> AddUsers { get; set; }
+            public ICollection<string> RemoveUsers { get; set; }
+
+            public ManageUserModel()
+            {
+
+            }
+
+            public ManageUserModel(string roleId, string roleName, ICollection<User> roleUsers, ICollection<User> otherUsers)
             {
                 RoleId = roleId;
+                RoleName = roleName;
                 RoleUsers = roleUsers;
                 OtherUsers = otherUsers;
             }

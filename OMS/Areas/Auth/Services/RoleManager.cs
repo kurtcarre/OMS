@@ -72,8 +72,11 @@ namespace OMS.Auth.Services
 
         public async Task<ICollection<User>> GetUsersNotInRoleAsync(Role role)
         {
-            ICollection<User> users = await _context.UserRoles.Include(u => u.User).Where(r => r.RoleId != role.Id).Select(u => u.User).ToListAsync();
-            users = users.Distinct().ToList();
+            ICollection<User> users = await _context.Users.Distinct().ToListAsync();
+            foreach(var user in role.Users)
+            {
+                users.Remove(user);
+            }
             return users;
         }
 

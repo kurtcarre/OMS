@@ -1,0 +1,23 @@
+﻿@model OMS.Auth.Models.Role
+@{
+	ViewData["Title"] = "Edit Role - " + Model.RoleName;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form id="edit-role" method="post">
+	<div asp-validation-summary="ModelOnly"></div>
+	<input asp-for="Id" type="hidden" />
+	<div class="form-group">
+		<label asp-for="RoleName"></label>
+		<input asp-for="RoleName" class="form-control" />
+		<span asp-validation-for="RoleName" class="text-danger"></span>
+	</div>
+	<button id="edit-role-submit" type="submit" class="btn btn-primary">Save...</button>
+	<a asp-area="Admin" asp-controller="Role" asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts
+{
+	<partial name="_ValidationScriptsPartial" />
+}
