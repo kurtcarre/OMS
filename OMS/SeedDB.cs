@@ -11,23 +11,6 @@ namespace OMS.Dev
     {
         public static async Task SeedDB(IHost host)
         {
-            Member kurt = new Member()
-            {
-                Title = "Mr.",
-                FirstName = "Kurt",
-                LastName = "Carré",
-                Email = "kurtcarre569@gmail.com",
-                Address1 = "Les Arbres",
-                Address2 = "Les Gigands",
-                Parish = "St. Sampson",
-                PostCode = "GY2 4YX",
-                MemberType = "Playing",
-                Under18 = false,
-                Section = "Brass",
-                Instrument = "French Horn",
-                DateJoined = new DateTime(2020, 11, 20)
-            };
-
             Member fred = new Member()
             {
                 Title = "Mr.",
@@ -200,7 +183,6 @@ namespace OMS.Dev
             var services = host.Services.CreateScope().ServiceProvider;
             var context = services.GetRequiredService<DBContext>();
 
-            context.Add(kurt);
             context.Add(fred);
             context.Add(billy);
             context.Add(billyChild);
