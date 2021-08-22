@@ -5,9 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OMS.Models;
 using OMS.Data;
+using OMS.AuthZ;
+using OMS.AuthZ.Models;
 
 namespace OMS.Controllers
 {
+    [PermissionType(PermissionType.Members)]
     public class MemberController : Controller
     {
         private readonly DBContext Context;
@@ -17,11 +20,13 @@ namespace OMS.Controllers
             Context = _context;
         }
 
+        [RequirePermission(Permission.Read)]
         public async Task<IActionResult> Index()
         {
             return View(await Context.Members.ToListAsync());
         }
 
+        [RequirePermission(Permission.Create)]
         public IActionResult Create()
         {
             return View();
@@ -29,6 +34,7 @@ namespace OMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permission.Create)]
         public async Task<IActionResult> Create(Member newMember)
         {
             if(ModelState.IsValid)
@@ -42,6 +48,7 @@ namespace OMS.Controllers
             return View();
         }
 
+        [RequirePermission(Permission.Write)]
         public async Task<IActionResult> Edit(int? Id)
         {
             if (Id == null)
@@ -56,6 +63,7 @@ namespace OMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permission.Write)]
         public async Task<IActionResult> Edit(int? Id, Member member)
         {
             if (Id == null)

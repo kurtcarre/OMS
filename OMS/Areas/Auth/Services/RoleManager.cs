@@ -92,6 +92,7 @@ namespace OMS.Auth.Services
             UserRole userRole = await _context.FindAsync<UserRole>(user.Id, role.Id);
             if (userRole == null)
                 return;
+
             _context.Remove(userRole);
             await _context.SaveChangesAsync();
         }

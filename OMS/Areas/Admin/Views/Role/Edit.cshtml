@@ -10,8 +10,29 @@
 	<input asp-for="Id" type="hidden" />
 	<div class="form-group">
 		<label asp-for="RoleName"></label>
-		<input asp-for="RoleName" class="form-control" />
+		<input class="form-control" asp-for="RoleName"  />
 		<span asp-validation-for="RoleName" class="text-danger"></span>
+	</div>
+	<div class="form-group">
+		<label asp-for="MemberPermissionString"></label>
+		<select class="form-control" asp-for="MemberPermissionString" asp-items="OMS.Auth.Models.Role.PermissionValues()"></select>
+		<span asp-validation-for="MemberPermissionString" class="text-danger"></span>
+		<label asp-for="ChildMemberPermissionString"></label>
+		<select class="form-control" asp-for="ChildMemberPermissionString" asp-items="OMS.Auth.Models.Role.PermissionValues()"></select>
+		<span asp-validation-for="ChildMemberPermissionString" class="text-danger"></span>
+	</div>
+	<div class="form-group">
+		<label asp-for="AdminPermissions"></label>
+		<input class="form-control" id="admin" asp-for="AdminPermissions" type="checkbox" />
+		<span asp-validation-for="AdminPermissions" class="text-danger"></span>
+		<div id="adminPerms" class="form-group">
+			<label asp-for="Admin_UserPermissionString"></label>
+			<select class="form-control" asp-for="Admin_UserPermissionString" asp-items="OMS.Auth.Models.Role.PermissionValues()"></select>
+			<span asp-validation-for="Admin_UserPermissionString" class="text-danger"></span>
+			<label asp-for="Admin_RolePermissionString"></label>
+			<select class="form-control" asp-for="Admin_RolePermissionString" asp-items="OMS.Auth.Models.Role.PermissionValues()"></select>
+			<span asp-validation-for="Admin_RolePermissionString" class="text-danger"></span>
+		</div>
 	</div>
 	<button id="edit-role-submit" type="submit" class="btn btn-primary">Save...</button>
 	<a asp-area="Admin" asp-controller="Role" asp-action="Index" class="btn btn-secondary">Cancel</a>
@@ -20,4 +41,22 @@
 @section Scripts
 {
 	<partial name="_ValidationScriptsPartial" />
+	<script type="text/javascript">
+		$(document).ready(function () {
+			if ($('#admin').is(':checked')) {
+				$('#adminPerms').show();
+			}
+			else {
+				$('#adminPerms').hide();
+			}
+		});
+		$("#admin").click(function () {
+			if ($(this).is(':checked')) {
+				$('#adminPerms').show();
+			}
+			else {
+				$('#adminPerms').hide();
+			}
+		});
+	</script>
 }

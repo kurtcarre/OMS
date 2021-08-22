@@ -54,7 +54,7 @@ namespace OMS.Auth.UI.Pages
             {
                 Logger.LogInformation(LoggerEventIds.UserLoggedIn, "User logged in!");
                 if (returnUrl == null)
-                    return LocalRedirect("~");
+                    return LocalRedirect("~/");
 
                 return LocalRedirect(returnUrl);
             }

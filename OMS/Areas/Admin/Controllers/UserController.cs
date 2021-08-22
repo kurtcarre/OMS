@@ -6,10 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OMS.Auth.Models;
 using OMS.Auth.Services;
+using OMS.AuthZ;
+using OMS.AuthZ.Models;
 
 namespace OMS.Admin.Controllers
 {
     [Area("Admin")]
+    [PermissionType(PermissionType.Admin_Users)]
     public class UserController : Controller
     {
         private readonly ILogger<UserController> logger;
@@ -41,12 +44,14 @@ namespace OMS.Admin.Controllers
             userManager = _userManager;
         }
 
+        [RequirePermission(Permission.Read)]
         public async Task<ActionResult> Index()
         {
             ViewData["Active"] = "users";
             return View(await userManager.Users.ToListAsync());
         }
 
+        [RequirePermission(Permission.Create)]
         public ActionResult Create()
         {
             return View();
@@ -54,6 +59,7 @@ namespace OMS.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permission.Create)]
         public async Task<ActionResult> Create(InputModel newUser)
         {
             User user = Activator.CreateInstance<User>();
@@ -65,6 +71,7 @@ namespace OMS.Admin.Controllers
             return RedirectToAction("Index", "User");
         }
 
+        [RequirePermission(Permission.Write)]
         public async Task<ActionResult> Edit(string Id)
         {
             if (Id == null || Id == string.Empty)
@@ -80,6 +87,7 @@ namespace OMS.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permission.Write)]
         public async Task<ActionResult> Edit(string Id, User user)
         {
             if (Id == null || Id == string.Empty)
@@ -89,6 +97,7 @@ namespace OMS.Admin.Controllers
             return RedirectToAction("Index", "User");
         }
 
+        [RequirePermission(Permission.Write)]
         public ActionResult ResetPassword(string Id)
         {
             if (Id == null || Id == string.Empty)
@@ -104,6 +113,7 @@ namespace OMS.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permission.Write)]
         public async Task<ActionResult> ResetPassword(string Id, ResetModel reset)
         {
             if (Id == null || Id == string.Empty)
@@ -135,6 +145,7 @@ namespace OMS.Admin.Controllers
             public string ConfirmPassword { get; set; }
         }
 
+        [RequirePermission(Permission.Full)]
         public async Task<ActionResult> Delete(string Id)
         {
             if (Id == null || Id == string.Empty)

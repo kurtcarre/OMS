@@ -1,13 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OMS.Auth.Models;
 using OMS.Auth.Services;
+using OMS.AuthZ;
+using OMS.AuthZ.Models;
 
 namespace OMS.Admin.Controllers
 {
     [Area("Admin")]
+    [PermissionType(PermissionType.Admin_Roles)]
     public class RoleController : Controller
     {
         private readonly RoleManager roleManager;
@@ -19,6 +23,7 @@ namespace OMS.Admin.Controllers
             userManager = _userManager;
         }
 
+        [RequirePermission(Permission.Read)]
         public async Task<ActionResult> Index()
         {
             ViewData["Active"] = "roles";
@@ -31,6 +36,7 @@ namespace OMS.Admin.Controllers
             return View(roles);
         }
 
+        [RequirePermission(Permission.Create)]
         public ActionResult Create()
         {
             return View();
@@ -38,12 +44,14 @@ namespace OMS.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permission.Create)]
         public async Task<ActionResult> Create(Role role)
         {
             await roleManager.CreateAsync(role);
             return RedirectToAction("Index", "Role");
         }
 
+        [RequirePermission(Permission.Write)]
         public async Task<ActionResult> Edit(string Id)
         {
             if (Id == null || Id == string.Empty)
@@ -53,20 +61,32 @@ namespace OMS.Admin.Controllers
             if (role == null)
                 return NotFound();
 
+            role.MemberPermissionString = role.MemberPermission.ToString();
+            role.ChildMemberPermissionString = role.ChildMemberPermission.ToString();
+            role.Admin_UserPermissionString = role.Admin_UserPermission.ToString();
+            role.Admin_RolePermissionString = role.Admin_RolePermission.ToString();
+
             return View(role);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permission.Write)]
         public async Task<ActionResult> Edit(string Id, Role role)
         {
             if (Id == null || Id == string.Empty)
                 return NotFound();
 
+            role.MemberPermission = Convert.ToInt32(role.MemberPermissionString);
+            role.ChildMemberPermission = Convert.ToInt32(role.ChildMemberPermissionString);
+            role.Admin_UserPermission = Convert.ToInt32(role.Admin_UserPermissionString);
+            role.Admin_RolePermission = Convert.ToInt32(role.Admin_RolePermissionString);
+
             await roleManager.AmendAsync(role);
             return RedirectToAction("Index", "Role");
         }
 
+        [RequirePermission(Permission.Full)]
         public async Task<ActionResult> Delete(string Id)
         {
             if (Id == null || Id == string.Empty)
@@ -80,6 +100,7 @@ namespace OMS.Admin.Controllers
             return RedirectToAction("Index", "Role");
         }
 
+        [RequirePermission(Permission.Write)]
         public async Task<ActionResult> ManageUsers(string Id)
         {
             if (Id == null || Id == string.Empty)
@@ -92,6 +113,7 @@ namespace OMS.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permission.Write)]
         public async Task<ActionResult> ManageUsers(string Id, ManageUserModel model)
         {
             if (Id == null || Id == string.Empty)

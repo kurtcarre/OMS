@@ -4,12 +4,77 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using OMS.Data;
 using OMS.Models;
+using OMS.Auth.Models;
+using OMS.Auth.Services;
+using OMS.AuthZ.Models;
 
 namespace OMS.Dev
 {
     public static class DevDB
     {
         public static async Task SeedDB(IHost host)
+        {
+            var services = host.Services.CreateScope().ServiceProvider;
+            await SeedMembers(services);
+            await SeedUsers(services);
+            await SeedRoles(services);
+            await AddUsersToRoles(services);
+        }
+
+        private static async Task SeedUsers(IServiceProvider services)
+        {
+            var hasher = services.GetRequiredService<PasswordHasher>();
+
+            User admin = new User()
+            {
+                UserName = "admin",
+                Email = "test@test.com",
+                PasswordHash = hasher.HashPassword("Qwerty123")
+            };
+
+            var context = services.GetRequiredService<DBContext>();
+
+            context.Add(admin);
+
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task SeedRoles(IServiceProvider services)
+        {
+            Role admin = new Role()
+            {
+                RoleName = "Admin",
+                MemberPermission = (int)Permission.Full,
+                ChildMemberPermission = (int)Permission.Full,
+                Admin_UserPermission = (int)Permission.Full,
+                Admin_RolePermission = (int)Permission.Full,
+                AdminPermissions = true
+            };
+
+            var context = services.GetRequiredService<DBContext>();
+
+            context.Add(admin);
+
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task AddUsersToRoles(IServiceProvider services)
+        {
+            var userManager = services.GetRequiredService<UserManager>();
+            var roleManager = services.GetRequiredService<RoleManager>();
+            var user = await userManager.FindUserByUsername("admin");
+            var role = await roleManager.FindRoleByNameAsync("Admin");
+
+            var assignment = new UserRole(user, role);
+
+            var context = services.GetRequiredService<DBContext>();
+
+            context.Add(assignment);
+
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task SeedMembers(IServiceProvider services)
         {
             Member fred = new Member()
             {
@@ -180,7 +245,6 @@ namespace OMS.Dev
                 Consent = true
             };
 
-            var services = host.Services.CreateScope().ServiceProvider;
             var context = services.GetRequiredService<DBContext>();
 
             context.Add(fred);

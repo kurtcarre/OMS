@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using OMS.Auth.Models;
+using OMS.AuthZ.Models;
 using OMS.Data;
 
 namespace OMS.Auth.Services
@@ -96,6 +98,26 @@ namespace OMS.Auth.Services
             string hash = hasher.HashPassword(newPassword);
             user.PasswordHash = hash;
             await AmendUser(user);
+        }
+
+        public async Task ResetPasswordAsync(User user, string newPassword)
+        {
+            string hash = hasher.HashPassword(newPassword);
+            user.PasswordHash = hash;
+            await AmendUser(user);
+        }
+
+        public Permission GetEffectivePermission(User user, string type)
+        {
+            int effectivePermission = 0;
+            foreach(var role in user.Roles)
+            {
+                int perm = (int)role.GetPermission(type);
+                if (perm > effectivePermission)
+                    effectivePermission = perm;
+            }
+
+            return (Permission)effectivePermission;
         }
     }
 }
