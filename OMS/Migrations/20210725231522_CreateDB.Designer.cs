@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OMS.Data;
 
 namespace OMS.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20210725231522_CreateDB")]
+    partial class CreateDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -23,21 +25,6 @@ namespace OMS.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("AdminPermissions")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Admin_RolePermission")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Admin_UserPermission")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ChildMemberPermission")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MemberPermission")
-                        .HasColumnType("int");
 
                     b.Property<string>("RoleName")
                         .HasColumnType("nvarchar(450)");

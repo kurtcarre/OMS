@@ -1,0 +1,27 @@
+﻿@model OMS.Auth.Models.User
+@{
+	ViewData["Title"] = "Edit User - " + Model.UserName;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form id="edit-user" method="post">
+	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+	<input asp-for="Id" type="hidden" />
+	<input asp-for="PasswordHash" type="hidden" />
+	<div class="form-group">
+		<label asp-for="UserName"></label>
+		<input asp-for="UserName" class="form-control" />
+		<span asp-validation-for="UserName" class="text-danger"></span>
+		<label asp-for="Email"></label>
+		<input asp-for="Email" class="form-control" />
+		<span asp-validation-for="Email" class="text-danger"></span>
+	</div>
+	<button id="edit-user-submit" type="submit" class="btn btn-primary">Save...</button>
+	<a asp-area="Admin" asp-controller="User" asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts
+{
+	<partial name="_ValidationScriptsPartial" />
+}

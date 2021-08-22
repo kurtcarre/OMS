@@ -4,6 +4,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using OMS.Data;
 using OMS.Models;
+using OMS.Auth.Models;
+using OMS.Auth.Services;
+using OMS.AuthZ.Models;
 
 namespace OMS.Dev
 {
@@ -11,27 +14,70 @@ namespace OMS.Dev
     {
         public static async Task SeedDB(IHost host)
         {
-            Member kurt = new Member()
+            var services = host.Services.CreateScope().ServiceProvider;
+            await SeedMembers(services);
+            await SeedUsers(services);
+            await SeedRoles(services);
+            await AddUsersToRoles(services);
+        }
+
+        private static async Task SeedUsers(IServiceProvider services)
+        {
+            var hasher = services.GetRequiredService<PasswordHasher>();
+
+            User admin = new User()
             {
-                MemberNo = 1,
-                Title = "Mr.",
-                FirstName = "Kurt",
-                LastName = "Carré",
-                Email = "kurtcarre569@gmail.com",
-                Address1 = "Les Arbres",
-                Address2 = "Les Gigands",
-                Parish = "St. Sampson",
-                PostCode = "GY2 4YX",
-                MemberType = "Playing",
-                Under18 = false,
-                Section = "Brass",
-                Instrument = "French Horn",
-                DateJoined = new DateTime(2020, 11, 20)
+                UserName = "admin",
+                Email = "test@test.com",
+                PasswordHash = hasher.HashPassword("Qwerty123")
             };
 
+            var context = services.GetRequiredService<DBContext>();
+
+            context.Add(admin);
+
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task SeedRoles(IServiceProvider services)
+        {
+            Role admin = new Role()
+            {
+                RoleName = "Admin",
+                MemberPermission = (int)Permission.Full,
+                ChildMemberPermission = (int)Permission.Full,
+                Admin_UserPermission = (int)Permission.Full,
+                Admin_RolePermission = (int)Permission.Full,
+                AdminPermissions = true
+            };
+
+            var context = services.GetRequiredService<DBContext>();
+
+            context.Add(admin);
+
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task AddUsersToRoles(IServiceProvider services)
+        {
+            var userManager = services.GetRequiredService<UserManager>();
+            var roleManager = services.GetRequiredService<RoleManager>();
+            var user = await userManager.FindUserByUsername("admin");
+            var role = await roleManager.FindRoleByNameAsync("Admin");
+
+            var assignment = new UserRole(user, role);
+
+            var context = services.GetRequiredService<DBContext>();
+
+            context.Add(assignment);
+
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task SeedMembers(IServiceProvider services)
+        {
             Member fred = new Member()
             {
-                MemberNo = 2,
                 Title = "Mr.",
                 FirstName = "Fred",
                 LastName = "Flintstone",
@@ -49,7 +95,6 @@ namespace OMS.Dev
 
             Member billy = new Member()
             {
-                MemberNo = 3,
                 Title = "Mr.",
                 FirstName = "Billy",
                 LastName = "Bob",
@@ -67,7 +112,6 @@ namespace OMS.Dev
 
             ChildMember billyChild = new ChildMember()
             {
-                MemberNo = 3,
                 Member = billy,
                 ParentFirstName = "Jill",
                 ParentLastName = "Bob",
@@ -78,7 +122,6 @@ namespace OMS.Dev
 
             Member lily = new Member()
             {
-                MemberNo = 4,
                 Title = "Miss",
                 FirstName = "Lily",
                 LastName = "Potter",
@@ -96,7 +139,6 @@ namespace OMS.Dev
 
             ChildMember lilyChild = new ChildMember()
             {
-                MemberNo = 4,
                 Member = lily,
                 ParentFirstName = "Harry",
                 ParentLastName = "Potter",
@@ -107,7 +149,6 @@ namespace OMS.Dev
 
             Member albus = new Member()
             {
-                MemberNo = 5,
                 Title = "Mr.",
                 FirstName = "Albus",
                 LastName = "Potter",
@@ -125,7 +166,6 @@ namespace OMS.Dev
 
             ChildMember albusChild = new ChildMember()
             {
-                MemberNo = 5,
                 Member = albus,
                 ParentFirstName = "Harry",
                 ParentLastName = "Potter",
@@ -136,7 +176,6 @@ namespace OMS.Dev
 
             Member rose = new Member()
             {
-                MemberNo = 6,
                 Title = "Miss",
                 FirstName = "Rose",
                 LastName = "Weasley",
@@ -154,7 +193,6 @@ namespace OMS.Dev
 
             ChildMember roseChild = new ChildMember()
             {
-                MemberNo = 6,
                 Member = rose,
                 ParentFirstName = "Hermione",
                 ParentLastName = "Granger",
@@ -165,7 +203,6 @@ namespace OMS.Dev
 
             Member barney = new Member()
             {
-                MemberNo = 7,
                 Title = "Mr.",
                 FirstName = "Barney",
                 LastName = "Rubble",
@@ -183,7 +220,6 @@ namespace OMS.Dev
 
             Member bambam = new Member()
             {
-                MemberNo = 8,
                 Title = "Miss",
                 FirstName = "BamBam",
                 LastName = "Flintstone",
@@ -201,7 +237,6 @@ namespace OMS.Dev
 
             ChildMember bambamChild = new ChildMember()
             {
-                MemberNo = 8,
                 Member = bambam,
                 ParentFirstName = "Fred",
                 ParentLastName = "Flintstone",
@@ -210,10 +245,8 @@ namespace OMS.Dev
                 Consent = true
             };
 
-            var services = host.Services.CreateScope().ServiceProvider;
             var context = services.GetRequiredService<DBContext>();
 
-            context.Add(kurt);
             context.Add(fred);
             context.Add(billy);
             context.Add(billyChild);

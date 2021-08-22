@@ -10,7 +10,7 @@ namespace OMS.Models
         [Key]
         [Display(Name = "Member number")]
         public int MemberNo { get; set; }
-        public Member Member { get; set; }
+        public virtual Member Member { get; set; }
 
         [Required]
         [DataType(DataType.Date)]

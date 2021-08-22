@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OMS.Auth;
+using OMS.AuthZ;
 using OMS.Data;
 using System;
 using System.Collections.Generic;
@@ -31,12 +32,12 @@ namespace OMS
             //  services.AddDbContext<ApplicationDbContext>(options =>
             //      options.UseSqlServer(
             //          Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDbContext<DBContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<DBContext>(options => options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             //  services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
             //      .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DBContext>();
+            services.AddAuth();
             services.AddRazorPages();
             services.AddControllersWithViews();
 
@@ -45,10 +46,10 @@ namespace OMS
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
 
-            services.AddAuthorization(options =>
+            /*services.AddAuthorization(options =>
             {
                 options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-            });
+            });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,7 +74,8 @@ namespace OMS
             app.UseRouting();
 
             app.UseAuthentication();
-            app.UseAuthorization();
+            //app.UseAuthorization();
+            app.UseMiddleware<OMSAuthorisationMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

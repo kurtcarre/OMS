@@ -1,4 +1,4 @@
-﻿@inject OMS.Auth.SignInManager<OMS.Auth.User> signIn
+﻿@inject OMS.Auth.Services.SignInManager signIn
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,6 +55,9 @@
                     </li>
                     <li class="nav-item">
 						<a id="users" class="nav-link" asp-area="Admin" asp-controller="User" asp-action="Index">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="roles" class="nav-link" asp-area="Admin" asp-controller="Role" asp-action="Index">Roles</a>
                     </li>
                 </ul>
             </nav>

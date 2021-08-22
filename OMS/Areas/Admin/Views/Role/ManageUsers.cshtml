@@ -1,0 +1,58 @@
+﻿@model OMS.Admin.Controllers.RoleController.ManageUserModel
+@{ 
+	ViewData["Title"] = "Manage Users - " + Model.RoleName;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form id="manage-users" method="post">
+	<input asp-for="RoleId" type="hidden" />	
+	<h3>Remove from role (these users are in the role)</h3>
+	<br />
+	<table class="table">
+		<tbody>
+			@if (Model.RoleUsers.Count == 0)
+			{
+				<tr>
+					<td>There are no users in this role</td>
+				</tr>
+			}
+			else
+			{
+				@foreach (var user in Model.RoleUsers)
+				{
+					<tr>
+						<td>@Html.DisplayFor(u => user.UserName)</td>
+						<td><input class="form-control" name="RemoveUsers" type="checkbox" value="@user.Id" /></td>
+					</tr>
+				}
+			}
+		</tbody>
+	</table>
+	<br />
+	<h3>Add to role (these users are not in the role)</h3>
+	<br />
+	<table class="table">
+		<tbody>
+			@if(Model.OtherUsers.Count == 0)
+            {
+				<tr>
+					<td>All users are in this role</td>
+				</tr>
+			}
+			else
+			{
+				@foreach (var user in Model.OtherUsers)
+				{
+					<tr>
+						<td>@Html.DisplayFor(u => user.UserName)</td>
+						<td><input class="form-control" name="AddUsers" type="checkbox" value="@user.Id"/></td>
+					</tr>
+				}
+			}
+		</tbody>
+	</table>
+	<br />
+	<button id="manage-users-submit" type="submit" class="btn btn-primary">Save...</button>
+	<a asp-area="Admin" asp-controller="Role" asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

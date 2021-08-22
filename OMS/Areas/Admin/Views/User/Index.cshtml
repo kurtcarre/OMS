@@ -1,16 +1,17 @@
-﻿@model IEnumerable<OMS.Auth.User>
+﻿@model IEnumerable<OMS.Auth.Models.User>
 @{
 	ViewData["Title"] = "Users";
 }
 
 <h1>Users</h1>
 
+<p><a class="btn btn-primary" asp-area="Admin" asp-controller="User" asp-action="Create">Create...</a></p>
+
 <table class="table">
 	<thead>
 		<tr>
 			<th>@Html.DisplayNameFor(model => model.UserName)</th>
 			<th>@Html.DisplayNameFor(model => model.Email)</th>
-			<th>@Html.DisplayNameFor(model => model.EmailConfirmed)</th>
 			<th>Actions</th>
 		</tr>
 	</thead>
@@ -20,8 +21,7 @@
 			<tr>
 				<td>@Html.DisplayFor(item => user.UserName)</td>
 				<td>@Html.DisplayFor(item => user.Email)</td>
-				<td>@Html.DisplayFor(item => user.EmailConfirmed)</td>
-				<td><a asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-id="@user.Id">Edit</a>&nbsp;<a asp-area="Admin" asp-controller="User" asp-action="ResetPassword" asp-route-id="@user.Id">Reset password</a></td>
+				<td><a asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-id="@user.Id">Edit</a>&nbsp;<a asp-area="Admin" asp-controller="User" asp-action="ResetPassword" asp-route-id="@user.Id">Reset password</a>&nbsp;<a asp-area="Admin" asp-controller="User" asp-action="Delete" asp-route-id="@user.Id">Delete</a></td>
 			</tr>
 		}
 	</tbody>

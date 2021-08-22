@@ -1,22 +1,22 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using OMS.Auth;
-using OMS.Data;
+using OMS.Auth.Models;
+using OMS.Auth.Services;
+using OMS.AuthZ;
+using OMS.AuthZ.Models;
 
 namespace OMS.Admin.Controllers
 {
     [Area("Admin")]
+    [PermissionType(PermissionType.Admin_Users)]
     public class UserController : Controller
     {
-        private readonly DBContext dbContext;
         private readonly ILogger<UserController> logger;
-        private readonly UserManager<User> userManager;
-        private readonly IUserStore<User> userStore;
+        private readonly UserManager userManager;
 
         public class InputModel
         {
@@ -38,20 +38,20 @@ namespace OMS.Admin.Controllers
             public string ConfirmPassword { get; set; }
         }
 
-        public UserController(DBContext _dbContext, ILogger<UserController> _logger, UserManager<User> _userManager, IUserStore<User> _userStore)
+        public UserController(ILogger<UserController> _logger, UserManager _userManager)
         {
-            dbContext = _dbContext;
             logger = _logger;
             userManager = _userManager;
-            userStore = _userStore;
         }
 
+        [RequirePermission(Permission.Read)]
         public async Task<ActionResult> Index()
         {
             ViewData["Active"] = "users";
-            return View(await dbContext.Users.ToListAsync());
+            return View(await userManager.Users.ToListAsync());
         }
 
+        [RequirePermission(Permission.Create)]
         public ActionResult Create()
         {
             return View();
@@ -59,30 +59,25 @@ namespace OMS.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permission.Create)]
         public async Task<ActionResult> Create(InputModel newUser)
         {
             User user = Activator.CreateInstance<User>();
 
-            await userStore.SetUserNameAsync(user, newUser.Username, CancellationToken.None);
-            IUserEmailStore<User> emailStore = userStore as IUserEmailStore<User>;
-            await emailStore.SetEmailAsync(user, newUser.Email, CancellationToken.None);
-            AuthResult result = await userManager.CreateAsync(user, newUser.Password);
-            if(result.Succeeded)
-            {
-                logger.LogInformation(LoggerEventIds.UserCreated, "New user created!");
-                return RedirectToAction("Index", "User");
-            }
-
-            ViewData["Error"] = result.ToString();
-            return View();
+            user.UserName = newUser.Username;
+            user.Email = newUser.Email;
+            await userManager.CreateUser(user, newUser.Password);
+            logger.LogInformation(LoggerEventIds.UserCreated, "New user created!");
+            return RedirectToAction("Index", "User");
         }
 
+        [RequirePermission(Permission.Write)]
         public async Task<ActionResult> Edit(string Id)
         {
             if (Id == null || Id == string.Empty)
                 return NotFound();
 
-            User user = await userStore.FindByIdAsync(Id, CancellationToken.None);
+            User user = await userManager.FindUserById(Id);
 
             if (user == null)
                 return NotFound();
@@ -92,16 +87,17 @@ namespace OMS.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(User user)
+        [RequirePermission(Permission.Write)]
+        public async Task<ActionResult> Edit(string Id, User user)
         {
-            AuthResult result = await userManager.UpdateAsync(user);
-            if (result.Succeeded)
-                return RedirectToAction("Index", "User");
+            if (Id == null || Id == string.Empty)
+                return NotFound();
 
-            ViewData["Error"] = result.ToString();
-            return View();
+            await userManager.AmendUser(user);
+            return RedirectToAction("Index", "User");
         }
 
+        [RequirePermission(Permission.Write)]
         public ActionResult ResetPassword(string Id)
         {
             if (Id == null || Id == string.Empty)
@@ -117,19 +113,19 @@ namespace OMS.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ResetPassword(ResetModel reset)
+        [RequirePermission(Permission.Write)]
+        public async Task<ActionResult> ResetPassword(string Id, ResetModel reset)
         {
-            User user = await userStore.FindByIdAsync(reset.Id, CancellationToken.None);
+            if (Id == null || Id == string.Empty)
+                return NotFound();
+
+            User user = await userManager.FindUserById(reset.Id);
 
             if (user == null)
                 return NotFound();
 
-            AuthResult result = await userManager.AdminResetPasswordAsync(user, reset.NewPassword);
-            if (result.Succeeded)
-                return RedirectToAction("Index", "User");
-
-            ViewData["Error"] = result.ToString();
-            return View();
+            await userManager.AdminResetPasswordAsync(user, reset.NewPassword);
+            return RedirectToAction("Index", "User");
         }
 
         public class ResetModel
@@ -147,6 +143,23 @@ namespace OMS.Admin.Controllers
             [Display(Name = "Confirm password")]
             [Compare("NewPassword", ErrorMessage = "Passwords must match!")]
             public string ConfirmPassword { get; set; }
+        }
+
+        [RequirePermission(Permission.Full)]
+        public async Task<ActionResult> Delete(string Id)
+        {
+            if (Id == null || Id == string.Empty)
+                return NotFound();
+
+            User user = await userManager.FindUserById(Id);
+            if (user == null)
+                return NotFound();
+
+            if (user.Id == User.FindFirst("UserID").Value)
+                return Forbid();
+
+            await userManager.DeleteUser(user);
+            return RedirectToAction("Index", "User");
         }
     }
 }
