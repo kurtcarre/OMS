@@ -23,6 +23,7 @@
 			<th>@Html.DisplayNameFor(model => model.Instrument)</th>
 			<th>@Html.DisplayNameFor(model => model.Under18)</th>
 			<th>@Html.DisplayNameFor(model => model.DateJoined)</th>
+			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -67,6 +68,9 @@
 			</td>
 			<td>
 				@Html.DisplayFor(item => member.DateJoined)
+			</td>
+			<td>
+				<a class="btn btn-danger" asp-controller="Member" asp-action="Delete" asp-route-id="@member.MemberNo">Delete</a>
 			</td>
 		</tr>
 		}

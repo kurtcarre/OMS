@@ -80,5 +80,19 @@ namespace OMS.Controllers
             }
             return View(member);
         }
+
+        [RequirePermission(Permission.Full)]
+        public async Task<IActionResult> Delete(int? Id)
+        {
+            if (Id == null)
+                return NotFound();
+
+            Member member = await Context.Members.FirstOrDefaultAsync(m => m.MemberNo == Id);
+            Context.Remove(member);
+
+            await Context.SaveChangesAsync();
+
+            return RedirectToAction("Index", "Member");
+        }
     }
 }

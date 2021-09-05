@@ -16,6 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
             }).AddCookie("OMS.Auth", o =>
             {
                 o.LoginPath = new PathString("/Auth/Account/Login");
+                o.AccessDeniedPath = new PathString("/Auth/AccessDenied");
             });
 
             services.AddHttpContextAccessor();
