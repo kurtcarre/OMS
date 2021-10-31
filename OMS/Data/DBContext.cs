@@ -14,6 +14,7 @@ namespace OMS.Data
 
         public DbSet<Member> Members { get; set; }
         public DbSet<ChildMember> ChildMembers { get; set; }
+        public DbSet<MailingListEntry> MailingListEntries { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
@@ -36,6 +37,13 @@ namespace OMS.Data
                 cm.Property(m => m.MemberNo).ValueGeneratedNever();
 
                 cm.HasOne(m => m.Member).WithOne().HasForeignKey<ChildMember>(k => k.MemberNo);
+            });
+
+            builder.Entity<MailingListEntry>(me =>
+            {
+                me.HasKey(m => m.Id);
+                me.ToTable("MailingList");
+                me.Property(m => m.Id).ValueGeneratedOnAdd();
             });
 
             builder.Entity<User>(u =>

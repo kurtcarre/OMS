@@ -1,0 +1,33 @@
+﻿@model IEnumerable<OMS.Models.MailingListEntry>
+
+@{ 
+	ViewData["Title"] = "Mailing List";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p><a asp-controller="MailingList" asp-action="Create" class="btn btn-primary">Create...</a></p>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>@Html.DisplayNameFor(model => model.LastName)</th>
+			<th>@Html.DisplayNameFor(model => model.FirstName)</th>
+			<th>@Html.DisplayNameFor(model => model.Email)</th>
+			<th>@Html.DisplayNameFor(model => model.Notes)</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach(var entry in Model)
+        {
+			<tr>
+				<td><a asp-controller="MailingList" asp-action="Edit" asp-route-id="@entry.Id">@Html.DisplayFor(item => entry.LastName)</a></td>
+				<td>@Html.DisplayFor(item => entry.FirstName)</td>
+				<td>@Html.DisplayFor(item => entry.Email)</td>
+				<td>@Html.DisplayFor(item => entry.Notes)</td>
+				<td><a asp-controller="MailingList" asp-action="Delete" asp-route-id="@entry.Id" class="btn btn-danger">Delete</a></td>
+			</tr>
+        }
+	</tbody>
+</table>

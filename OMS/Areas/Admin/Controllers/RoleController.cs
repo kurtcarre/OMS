@@ -63,6 +63,7 @@ namespace OMS.Admin.Controllers
 
             role.MemberPermissionString = role.MemberPermission.ToString();
             role.ChildMemberPermissionString = role.ChildMemberPermission.ToString();
+            role.MailingListPermissionString = role.MailingListPermission.ToString();
             role.Admin_UserPermissionString = role.Admin_UserPermission.ToString();
             role.Admin_RolePermissionString = role.Admin_RolePermission.ToString();
 
@@ -79,6 +80,7 @@ namespace OMS.Admin.Controllers
 
             role.MemberPermission = Convert.ToInt32(role.MemberPermissionString);
             role.ChildMemberPermission = Convert.ToInt32(role.ChildMemberPermissionString);
+            role.MailingListPermission = Convert.ToInt32(role.MailingListPermissionString);
             role.Admin_UserPermission = Convert.ToInt32(role.Admin_UserPermissionString);
             role.Admin_RolePermission = Convert.ToInt32(role.Admin_RolePermissionString);
 

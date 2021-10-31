@@ -17,6 +17,7 @@ namespace OMS.Auth.Models
 
         public int MemberPermission { get; set; }
         public int ChildMemberPermission { get; set; }
+        public int MailingListPermission { get; set; }
 
         [Display(Name = "Has admin permissions?")]
         public bool AdminPermissions { get; set; }
@@ -29,6 +30,9 @@ namespace OMS.Auth.Models
         [NotMapped]
         [Display(Name = "Child Member Permissions")]
         public string ChildMemberPermissionString { get; set; }
+        [NotMapped]
+        [Display(Name = "Mailing List Permissions")]
+        public string MailingListPermissionString { get; set; }
         [NotMapped]
         [Display(Name = "User Permissions")]
         public string Admin_UserPermissionString { get; set; }
@@ -56,9 +60,10 @@ namespace OMS.Auth.Models
             {
                 case PermissionType.Members: return (Permission)MemberPermission;
                 case PermissionType.ChildMembers: return (Permission)ChildMemberPermission;
+                case PermissionType.MailingListEntries: return (Permission)MailingListPermission;
                 case PermissionType.Admin_Users: return AdminPermissions ? (Permission)Admin_UserPermission : Permission.None;
                 case PermissionType.Admin_Roles: return AdminPermissions ? (Permission)Admin_RolePermission : Permission.None;
-                default: return Permission.None;
+                default: return RoleName == "Admin" ? Permission.Full : Permission.None;
             }
         }
 

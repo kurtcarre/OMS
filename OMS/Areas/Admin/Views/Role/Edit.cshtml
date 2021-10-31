@@ -20,6 +20,9 @@
 		<label asp-for="ChildMemberPermissionString"></label>
 		<select class="form-control" asp-for="ChildMemberPermissionString" asp-items="OMS.Auth.Models.Role.PermissionValues()"></select>
 		<span asp-validation-for="ChildMemberPermissionString" class="text-danger"></span>
+		<label asp-for="MailingListPermissionString"></label>
+		<select class="form-control" asp-for="MailingListPermissionString" asp-items="OMS.Auth.Models.Role.PermissionValues()"></select>
+		<span asp-validation-for="MailingListPermissionString" class="text-danger"></span>
 	</div>
 	<div class="form-group">
 		<label asp-for="AdminPermissions"></label>
