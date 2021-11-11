@@ -21,7 +21,7 @@
 			<tr>
 				<td>@Html.DisplayFor(item => role.RoleName)</td>
 				<td>@Html.DisplayFor(item => role.Users)</td>
-				<td><a asp-area="Admin" asp-controller="Role" asp-action="ManageUsers" asp-route-id="@role.Id">Manage Users</a>&nbsp;<a asp-area="Admin" asp-controller="Role" asp-action="Edit" asp-route-id="@role.Id">Edit</a>&nbsp;<a asp-area="Admin" asp-controller="Role" asp-action="Delete" asp-route-id="@role.Id">Delete</a></td>
+				<td><a asp-area="Admin" asp-controller="Role" asp-action="ManageUsers" asp-route-id="@role.Id" class="btn btn-primary">Manage Users</a>&nbsp;<a asp-area="Admin" asp-controller="Role" asp-action="Edit" asp-route-id="@role.Id" class="btn btn-secondary">Edit</a>&nbsp;<a asp-area="Admin" asp-controller="Role" asp-action="Delete" asp-route-id="@role.Id" class="btn btn-danger">Delete</a></td>
 			</tr>
         }
 	</tbody>

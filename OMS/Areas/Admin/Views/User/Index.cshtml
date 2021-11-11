@@ -21,7 +21,7 @@
 			<tr>
 				<td>@Html.DisplayFor(item => user.UserName)</td>
 				<td>@Html.DisplayFor(item => user.Email)</td>
-				<td><a asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-id="@user.Id">Edit</a>&nbsp;<a asp-area="Admin" asp-controller="User" asp-action="ResetPassword" asp-route-id="@user.Id">Reset password</a>&nbsp;<a asp-area="Admin" asp-controller="User" asp-action="Delete" asp-route-id="@user.Id">Delete</a></td>
+				<td><a asp-area="Admin" asp-controller="User" asp-action="ResetPassword" asp-route-id="@user.Id" class="btn btn-primary">Reset password</a>&nbsp;<a asp-area="Admin" asp-controller="User" asp-action="Edit" asp-route-id="@user.Id" class="btn btn-secondary">Edit</a>&nbsp;<a asp-area="Admin" asp-controller="User" asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger">Delete</a></td>
 			</tr>
 		}
 	</tbody>
