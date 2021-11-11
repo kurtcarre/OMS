@@ -1,6 +1,6 @@
-﻿@model OMS.Auth.Models.User
+﻿@model OMS.Admin.Controllers.UserController.EditModel
 @{
-	ViewData["Title"] = "Edit User - " + Model.UserName;
+	ViewData["Title"] = "Edit User - " + Model.Username;
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -8,11 +8,10 @@
 <form id="edit-user" method="post">
 	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 	<input asp-for="Id" type="hidden" />
-	<input asp-for="PasswordHash" type="hidden" />
 	<div class="form-group">
-		<label asp-for="UserName"></label>
-		<input asp-for="UserName" class="form-control" />
-		<span asp-validation-for="UserName" class="text-danger"></span>
+		<label asp-for="Username"></label>
+		<input asp-for="Username" class="form-control" />
+		<span asp-validation-for="Username" class="text-danger"></span>
 		<label asp-for="Email"></label>
 		<input asp-for="Email" class="form-control" />
 		<span asp-validation-for="Email" class="text-danger"></span>

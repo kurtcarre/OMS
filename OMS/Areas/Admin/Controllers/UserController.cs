@@ -18,7 +18,7 @@ namespace OMS.Admin.Controllers
         private readonly ILogger<UserController> logger;
         private readonly UserManager userManager;
 
-        public class InputModel
+        public class CreateModel
         {
             [Required]
             public string Username { get; set; }
@@ -35,6 +35,36 @@ namespace OMS.Admin.Controllers
             [DataType(DataType.Password)]
             [Display(Name = "Confirm Password")]
             [Compare("Password", ErrorMessage = "Passwords don't match!")]
+            public string ConfirmPassword { get; set; }
+        }
+
+        public class EditModel
+        {
+            [Required]
+            public string Id { get; set; }
+
+            [Required]
+            public string Username { get; set; }
+
+            [Required]
+            [EmailAddress]
+            public string Email { get; set; }
+        }
+
+        public class ResetModel
+        {
+            [Required]
+            public string Id { get; set; }
+
+            [Required]
+            [DataType(DataType.Password)]
+            [Display(Name = "New password")]
+            public string NewPassword { get; set; }
+
+            [Required]
+            [DataType(DataType.Password)]
+            [Display(Name = "Confirm password")]
+            [Compare("NewPassword", ErrorMessage = "Passwords must match!")]
             public string ConfirmPassword { get; set; }
         }
 
@@ -60,7 +90,7 @@ namespace OMS.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequirePermission(Permission.Create)]
-        public async Task<ActionResult> Create(InputModel newUser)
+        public async Task<ActionResult> Create(CreateModel newUser)
         {
             User user = Activator.CreateInstance<User>();
 
@@ -79,19 +109,31 @@ namespace OMS.Admin.Controllers
 
             User user = await userManager.FindUserById(Id);
 
+            EditModel editModel = new EditModel
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                Email = user.Email
+            };
+
             if (user == null)
                 return NotFound();
 
-            return View(user);
+            return View(editModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequirePermission(Permission.Write)]
-        public async Task<ActionResult> Edit(string Id, User user)
+        public async Task<ActionResult> Edit(string Id, EditModel model)
         {
             if (Id == null || Id == string.Empty)
                 return NotFound();
+
+            User user = await userManager.FindUserById(model.Id);
+
+            user.UserName = model.Username;
+            user.Email = model.Email;
 
             await userManager.AmendUser(user);
             return RedirectToAction("Index", "User");
@@ -126,23 +168,6 @@ namespace OMS.Admin.Controllers
 
             await userManager.AdminResetPasswordAsync(user, reset.NewPassword);
             return RedirectToAction("Index", "User");
-        }
-
-        public class ResetModel
-        {
-            [Required]
-            public string Id { get; set; }
-
-            [Required]
-            [DataType(DataType.Password)]
-            [Display(Name = "New password")]
-            public string NewPassword { get; set; }
-
-            [Required]
-            [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("NewPassword", ErrorMessage = "Passwords must match!")]
-            public string ConfirmPassword { get; set; }
         }
 
         [RequirePermission(Permission.Full)]
