@@ -14,11 +14,14 @@ namespace OMS.Dev
     {
         public static async Task SeedDB(IHost host)
         {
-            var services = host.Services.CreateScope().ServiceProvider;
+            var scope = host.Services.CreateScope();
+            var services = scope.ServiceProvider;
             await SeedMembers(services);
             await SeedUsers(services);
             await SeedRoles(services);
             await AddUsersToRoles(services);
+
+            scope.Dispose();
         }
 
         private static async Task SeedUsers(IServiceProvider services)
