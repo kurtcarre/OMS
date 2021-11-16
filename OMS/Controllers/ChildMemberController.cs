@@ -78,6 +78,8 @@ namespace OMS.Controllers
                 Context.ChildMembers.Update(childMember);
                 await Context.SaveChangesAsync();
             }
+
+            childMember.Member = await Context.Members.FirstOrDefaultAsync(mem => mem.MemberNo == Id);
             return View(childMember);
         }
     }

@@ -38,6 +38,9 @@ namespace OMS.Models
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Emergency contact number")]
         public string EmergencyContactNo { get; set; }
+        [DataType(DataType.EmailAddress)]
+        [Display(Name = "Parent e-mail address")]
+        public string ParentEmailAddress { get; set; }
 
         public bool Consent { get; set; }
     }

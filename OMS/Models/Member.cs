@@ -20,7 +20,9 @@ namespace OMS.Models
         
         [EmailAddress]
         public string Email { get; set; }
+        [Display(Name = "Address 1")]
         public string Address1 { get; set; }
+        [Display(Name = "Address 2")]
         public string Address2 { get; set; }
         public string Parish { get; set; }
         [Display(Name = "Post code")]
@@ -40,6 +42,8 @@ namespace OMS.Models
         [DataType(DataType.Date)]
         [Display(Name = "Date joined")]
         public DateTime DateJoined { get; set; }
+
+        public string Notes { get; set; }
 
         public static readonly List<SelectListItem> Titles = new List<SelectListItem>(new SelectListItem[]
             {
