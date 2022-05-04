@@ -24,6 +24,14 @@ namespace OMS.Dev
             scope.Dispose();
         }
 
+        public static async Task SeedTestData(IHost host)
+        {
+            var scope = host.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            await SeedMembers(services);
+            scope.Dispose();
+        }
+
         private static async Task SeedUsers(IServiceProvider services)
         {
             var hasher = services.GetRequiredService<PasswordHasher>();
